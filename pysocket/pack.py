@@ -69,10 +69,12 @@ def dumps(obj: Any):
     elif isinstance(obj, str):
         data = b"\x03" + pack_int(len(obj))
         data += obj.encode()
+        return data
 
     elif isinstance(obj, bytes):
         data = b"\x04" + pack_int(len(obj))
         data += obj
+        return data
 
 
 def loads(data: bytes):
