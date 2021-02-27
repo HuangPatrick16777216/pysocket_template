@@ -31,13 +31,13 @@ class Client:
     """
 
     conn: socket.socket
-    addr: Tuple[str, int]
+    addr: Tuple
     start_func: Callable
 
     verbose: bool
     active: bool
 
-    def __init__(self, conn, addr, start_func, verbose):
+    def __init__(self, conn: socket.socket, addr: Tuple, start_func: Callable, verbose: bool):
         """
         Initializes client.
         :param conn: Connection to the client.
@@ -110,7 +110,7 @@ class Server:
             self.clients.append(client)
             threading.Thread(target=client.start).start()
 
-    def quit(self, force=False):
+    def quit(self, force: bool = False):
         """
         Quits the server and all connected clients.
         :param force: Whether to force quit Python.
