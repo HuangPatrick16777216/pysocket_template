@@ -76,6 +76,18 @@ def dumps(obj: Any):
         data += obj
         return data
 
+    elif isinstance(obj, tuple):
+        data = b"\x05"
+        data += len(obj)
+        for o in obj:
+            data += dumps(o)
+
+    elif isinstance(obj, list):
+        data = b"\x06"
+        data += len(obj)
+        for o in obj:
+            data += dumps(o)
+
 
 def loads(data: bytes):
     """
