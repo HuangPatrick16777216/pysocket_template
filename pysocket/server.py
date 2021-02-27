@@ -19,6 +19,7 @@
 
 import threading
 import socket
+import ctypes
 from typing import Callable, List, Tuple
 
 
@@ -51,9 +52,16 @@ class Client:
         self.active = True
 
     def start(self):
+        """
+        Runs start_func and starts.
+        """
         self.start_func()
 
     def quit(self):
+        """
+        Sets self.active to False
+        This can be checked in the start_func.
+        """
         self.active = False
 
 
@@ -102,8 +110,15 @@ class Server:
             self.clients.append(client)
             threading.Thread(target=client.start).start()
 
-    def quit(self):
+    def quit(self, force=False):
+        """
+        Quits the server and all connected clients.
+        :param force: Whether to force quit Python.
+        """
         self.active = False
         self.server.close()
         for c in self.clients:
             c.quit()
+
+        if force:
+            ctypes.pointer(ctypes.c_char.from_address(5))[0]
