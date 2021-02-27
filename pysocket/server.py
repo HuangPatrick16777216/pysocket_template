@@ -61,6 +61,7 @@ class Client:
         self.start_func(self)
 
     def quit(self):
+        self.conn.close()
         self.active = False
 
     def send(self, obj):
