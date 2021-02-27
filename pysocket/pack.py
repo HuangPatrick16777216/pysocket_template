@@ -21,7 +21,7 @@
 # Safe to use.
 
 import struct
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 ALLOWED_TYPES = (
     bool,
@@ -31,6 +31,7 @@ ALLOWED_TYPES = (
     bytes,
     Tuple,
     List,
+    Dict,
 )
 
 
@@ -56,39 +57,36 @@ def dumps(obj: Any):
     if isinstance(obj, bool):
         data = b"\x00"
         data += b"\x01" if obj else b"\x00"
-        return data
-
     elif isinstance(obj, int):
         data = b"\x01" + pack_int(obj)
-        return data
-
     elif isinstance(obj, float):
         data = b"\x02" + pack_float(obj)
-        return data
-
     elif isinstance(obj, str):
         data = b"\x03" + pack_int(len(obj))
         data += obj.encode()
-        return data
-
     elif isinstance(obj, bytes):
         data = b"\x04" + pack_int(len(obj))
         data += obj
-        return data
-
     elif isinstance(obj, tuple):
         data = b"\x05"
         data += pack_int(len(obj))
         for o in obj:
             data += dumps(o)
-        return data
-
     elif isinstance(obj, list):
         data = b"\x06"
         data += pack_int(len(obj))
         for o in obj:
             data += dumps(o)
-        return data
+    elif isinstance(obj, dict):
+        data = b"\x07"
+        data += pack_int(len(obj))
+        for key, o in obj.items():
+            data += dumps(key)
+            data += dumps(o)
+    else:
+        raise NotImplementedError(f"Type {type(obj)} not allowed.")
+
+    return data
 
 
 def loads(data: bytes):
