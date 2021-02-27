@@ -137,7 +137,11 @@ class Server:
             print(f"[SERVER] Started. IP={self.ip}, PORT={self.port}")
 
         while self.active:
-            conn, addr = self.server.accept()
+            try:
+                conn, addr = self.server.accept()
+            except KeyboardInterrupt:
+                self.quit(True)
+                return
             client = Client(conn, addr, self.client_start, self.verbose, self.cipher)
             self.clients.append(client)
             threading.Thread(target=client.start).start()
