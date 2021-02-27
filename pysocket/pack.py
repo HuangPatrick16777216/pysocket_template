@@ -105,8 +105,14 @@ def loads(data: bytes):
         obj = True if file.read(1) == b"\x01" else False
     elif cls == b"\x01" or cls == b"\x02":
         obj = unpack_num(file.read(5))
+    elif cls == b"\x03":
+        length = unpack_num(file.read(5))
+        obj = file.read(length).decode()
+    elif cls == b"\x04":
+        length = unpack_num(file.read(5))
+        obj = file.read(length)
 
     return obj
 
-a = 84.56
+a = b"84.56"
 print(loads(dumps(a)))
