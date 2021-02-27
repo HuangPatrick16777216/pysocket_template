@@ -113,6 +113,8 @@ class Server:
     ip: str
     port: int
     client_start: Callable
+    cipher_key: bytes
+    cipher: Fernet
 
     verbose: bool
     active: bool
@@ -120,16 +122,20 @@ class Server:
 
     server: socket.socket
 
-    def __init__(self, ip: str, port: int, client_start: Callable, verbose: bool = True):
+    def __init__(self, ip: str, port: int, client_start: Callable, cipher_key: bytes = None, verbose: bool = True):
         """
         Initializes server.
         :param ip: IP address to bind to.
         :param port: Port to bind to.
+        :param client_start: Start function of clients.
+        :param cipher_key: Key used to encrypt messages. Auto-generated if set to None.
         :param verbose: Whether to print information to the console.
         """
         self.ip = ip
         self.port = port
         self.client_start = client_start
+        self.cipher_key = cipher_key if cipher_key is not None else Fernet.generate_key()
+        self.cipher = Fernet(self.cipher_key)
 
         self.verbose = verbose
         self.active = True
@@ -145,7 +151,7 @@ class Server:
 
         while self.active:
             conn, addr = self.server.accept()
-            client = Client(conn, addr, self.client_start, self.verbose)
+            client = Client(conn, addr, self.client_start, self.verbose, self.cipher)
             self.clients.append(client)
             threading.Thread(target=client.start).start()
 
