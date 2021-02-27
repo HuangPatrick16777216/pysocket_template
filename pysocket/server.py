@@ -109,7 +109,7 @@ class Server:
 
     server: socket.socket
 
-    def __init__(self, ip: str, port: int, client_start: Callable, cipher_key: bytes = None, verbose: bool = True):
+    def __init__(self, ip: str, port: int, client_start: Callable, cipher_key: bytes, verbose: bool = True):
         """
         Initializes server.
         :param ip: IP address to bind to.
@@ -121,7 +121,7 @@ class Server:
         self.ip = ip
         self.port = port
         self.client_start = client_start
-        self.cipher_key = cipher_key if cipher_key is not None else Fernet.generate_key()
+        self.cipher_key = cipher_key
         self.cipher = Fernet(self.cipher_key)
 
         self.verbose = verbose
