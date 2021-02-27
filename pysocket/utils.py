@@ -39,6 +39,24 @@ def dumps(obj: Any):
     Saves obj as a byte string.
     :param obj: Any object in ALLOWED_TYPES.
     """
+    if isinstance(obj, bool):
+        data = b"\x00"
+        data += b"\x01" if obj else b"\x00"
+        return data
+
+    elif isinstance(obj, int):
+        packed = struct.pack("<I", obj)
+        if len(packed) != 4:
+            raise ValueError(f"Integer {obj} too large to pack as 32 bits.")
+        data = b"\x01" + packed
+        return data
+
+    elif isinstance(obj, float):
+        packed = struct.pack("f", obj)
+        if len(packed) != 4:
+            raise ValueError(f"Integer {obj} too large to pack as 32 bits.")
+        data = b"\x02" + packed
+        return data
 
 
 def loads(data: bytes):
