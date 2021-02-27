@@ -34,6 +34,20 @@ ALLOWED_TYPES = (
 )
 
 
+def pack_int(i):
+    packed = struct.pack("<I", i)
+    if len(packed) != 4:
+        raise ValueError(f"Integer {i} too large to pack as 32 bits.")
+    return packed
+
+
+def pack_float(i):
+    packed = struct.pack("f", i)
+    if len(packed) != 4:
+        raise ValueError(f"Float {i} too large to pack as 32 bits.")
+    return packed
+
+
 def dumps(obj: Any):
     """
     Saves obj as a byte string.
@@ -45,18 +59,16 @@ def dumps(obj: Any):
         return data
 
     elif isinstance(obj, int):
-        packed = struct.pack("<I", obj)
-        if len(packed) != 4:
-            raise ValueError(f"Integer {obj} too large to pack as 32 bits.")
-        data = b"\x01" + packed
+        data = b"\x01" + pack_int(obj)
         return data
 
     elif isinstance(obj, float):
-        packed = struct.pack("f", obj)
-        if len(packed) != 4:
-            raise ValueError(f"Integer {obj} too large to pack as 32 bits.")
-        data = b"\x02" + packed
+        data = b"\x02" + pack_float(obj)
         return data
+
+    elif isinstance(obj, str):
+        data = b"\x03" + pack_int(len(obj))
+        data += obj.encode()
 
 
 def loads(data: bytes):
