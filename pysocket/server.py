@@ -57,6 +57,9 @@ class Client:
         self.padding = " " * self.header
         self.packet_size = 8192
 
+    def alert(self, msg):
+        print(f"[{self.addr}] {msg}")
+
     def start(self):
         self.start_func(self)
 
