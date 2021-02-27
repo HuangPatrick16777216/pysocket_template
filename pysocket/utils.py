@@ -21,7 +21,17 @@
 # Safe to use.
 
 import struct
-from typing import Any
+from typing import Any, List, Tuple
+
+ALLOWED_TYPES = (
+    bool,
+    int,
+    float,
+    str,
+    bytes,
+    Tuple,
+    List,
+)
 
 
 def dumps(obj: Any):
