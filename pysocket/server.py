@@ -58,7 +58,7 @@ class Client:
         self.packet_size = 8192
 
     def start(self):
-        self.start_func()
+        self.start_func(self)
 
     def quit(self):
         self.active = False
