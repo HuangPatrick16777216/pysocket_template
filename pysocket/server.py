@@ -45,12 +45,6 @@ class Client:
     packet_size: int
 
     def __init__(self, conn: socket.socket, addr: Tuple, start_func: Callable, verbose: bool, cipher: Fernet):
-        """
-        Initializes client.
-        :param conn: Connection to the client.
-        :param addr: Client address.
-        :param verbose: Whether to print info to the console.
-        """
         self.conn = conn
         self.addr = addr
         self.start_func = start_func
@@ -64,16 +58,9 @@ class Client:
         self.packet_size = 8192
 
     def start(self):
-        """
-        Runs start_func and starts.
-        """
         self.start_func()
 
     def quit(self):
-        """
-        Sets self.active to False
-        This can be checked in the start_func.
-        """
         self.active = False
 
     def send(self, obj):
