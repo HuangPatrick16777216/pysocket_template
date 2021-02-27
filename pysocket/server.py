@@ -21,6 +21,7 @@ import threading
 import socket
 import ctypes
 from typing import Callable, List, Tuple
+from .pack import loads, dumps
 
 
 class Client:
