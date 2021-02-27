@@ -21,6 +21,7 @@
 # Safe to use.
 
 import struct
+import io
 from typing import Any, Dict, List, Tuple
 
 ALLOWED_TYPES = (
@@ -35,18 +36,21 @@ ALLOWED_TYPES = (
 )
 
 
-def pack_int(i):
-    packed = struct.pack("<I", i)
-    if len(packed) != 4:
-        raise ValueError(f"Integer {i} too large to pack as 32 bits.")
-    return packed
-
-
-def pack_float(i):
-    packed = struct.pack("f", i)
+def pack_num(i):
+    packed = struct.pack("f", float(i))
     if len(packed) != 4:
         raise ValueError(f"Float {i} too large to pack as 32 bits.")
-    return packed
+    cls = b"\x00" if isinstance(i, int) else b"\x01"
+    return cls + packed
+
+
+def unpack_num(data):
+    file = io.BytesIO(data)
+    cls = file.read(1)
+    num = struct.unpack("f", file.read(4))[0]
+    if cls == b"\x00":
+        num = int(num)
+    return num
 
 
 def dumps(obj: Any):
@@ -58,28 +62,28 @@ def dumps(obj: Any):
         data = b"\x00"
         data += b"\x01" if obj else b"\x00"
     elif isinstance(obj, int):
-        data = b"\x01" + pack_int(obj)
+        data = b"\x01" + pack_num(obj)
     elif isinstance(obj, float):
-        data = b"\x02" + pack_float(obj)
+        data = b"\x02" + pack_num(obj)
     elif isinstance(obj, str):
-        data = b"\x03" + pack_int(len(obj))
+        data = b"\x03" + pack_num(len(obj))
         data += obj.encode()
     elif isinstance(obj, bytes):
-        data = b"\x04" + pack_int(len(obj))
+        data = b"\x04" + pack_num(len(obj))
         data += obj
     elif isinstance(obj, tuple):
         data = b"\x05"
-        data += pack_int(len(obj))
+        data += pack_num(len(obj))
         for o in obj:
             data += dumps(o)
     elif isinstance(obj, list):
         data = b"\x06"
-        data += pack_int(len(obj))
+        data += pack_num(len(obj))
         for o in obj:
             data += dumps(o)
     elif isinstance(obj, dict):
         data = b"\x07"
-        data += pack_int(len(obj))
+        data += pack_num(len(obj))
         for key, o in obj.items():
             data += dumps(key)
             data += dumps(o)
@@ -94,3 +98,15 @@ def loads(data: bytes):
     Loads byte string as an object.
     :param data: String of bytes to load.
     """
+    file = io.BytesIO(data)
+    cls = file.read(1)
+
+    if cls == b"\x00":
+        obj = True if file.read(1) == b"\x01" else False
+    elif cls == b"\x01" or cls == b"\x02":
+        obj = unpack_num(file.read(5))
+
+    return obj
+
+a = 84.56
+print(loads(dumps(a)))
