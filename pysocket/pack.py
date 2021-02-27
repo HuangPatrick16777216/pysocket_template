@@ -106,22 +106,26 @@ def loads(data):
     if cls == b"\x00":
         obj = True if data.read(1) == b"\x01" else False
     elif cls in (b"\x01", b"\x02"):
-        obj = unpack_num(data.read(5))
+        obj = unpack_num(data)
     elif cls == b"\x03":
-        length = unpack_num(data.read(5))
+        length = unpack_num(data)
         obj = data.read(length).decode()
     elif cls == b"\x04":
-        length = unpack_num(data.read(5))
+        length = unpack_num(data)
         obj = data.read(length)
     elif cls in (b"\x05", b"\x06"):
-        length = unpack_num(data.read(5))
+        length = unpack_num(data)
         obj = []
         for _ in range(length):
             obj.append(loads(data))
         if cls == b"\x05":
             obj = tuple(obj)
+    elif cls == b"\x07":
+        length = unpack_num(data)
+        obj = {}
+        for _ in range(length):
+            key = loads(data)
+            o = loads(data)
+            obj[key] = o
 
     return obj
-
-a = (1, 2, 3, [2, 3, 4], True, "bsdf")
-print(loads(dumps(a)))
