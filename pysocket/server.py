@@ -31,10 +31,10 @@ class Client:
 
     conn: socket.socket
     addr: Tuple[str, int]
-    start: Callable
+    start_func: Callable
     verbose: bool
 
-    def __init__(self, conn, addr, start, verbose):
+    def __init__(self, conn, addr, start_func, verbose):
         """
         Initializes client.
         :param conn: Connection to the client.
@@ -43,8 +43,11 @@ class Client:
         """
         self.conn = conn
         self.addr = addr
-        self.start = start
+        self.start_func = start_func
         self.verbose = verbose
+
+    def start(self):
+        self.start_func()
 
 
 class Server:
@@ -55,9 +58,12 @@ class Server:
 
     ip: str
     port: int
+    client_start: Callable
+
     verbose: bool
     active: bool
     clients: List[Client]
+
     server: socket.socket
 
     def __init__(self, ip: str, port: int, client_start: Callable, verbose: bool = True):
@@ -69,6 +75,8 @@ class Server:
         """
         self.ip = ip
         self.port = port
+        self.client_start = client_start
+
         self.verbose = verbose
         self.active = True
         self.clients = []
@@ -83,3 +91,6 @@ class Server:
 
         while True:
             conn, addr = self.server.accept()
+            client = Client(conn, addr, self.client_start, self.verbose)
+            self.clients.append(client)
+            threading.Thread(target=client.start).start()
