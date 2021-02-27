@@ -32,7 +32,9 @@ class Client:
     conn: socket.socket
     addr: Tuple[str, int]
     start_func: Callable
+
     verbose: bool
+    active: bool
 
     def __init__(self, conn, addr, start_func, verbose):
         """
@@ -44,10 +46,15 @@ class Client:
         self.conn = conn
         self.addr = addr
         self.start_func = start_func
+
         self.verbose = verbose
+        self.active = True
 
     def start(self):
         self.start_func()
+
+    def quit(self):
+        self.active = False
 
 
 class Server:
@@ -89,8 +96,14 @@ class Server:
         if self.verbose:
             print(f"[SERVER] Started. IP={self.ip}, PORT={self.port}")
 
-        while True:
+        while self.active:
             conn, addr = self.server.accept()
             client = Client(conn, addr, self.client_start, self.verbose)
             self.clients.append(client)
             threading.Thread(target=client.start).start()
+
+    def quit(self):
+        self.active = False
+        self.server.close()
+        for c in self.clients:
+            c.quit()
