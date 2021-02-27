@@ -47,3 +47,11 @@ class Server:
 
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind((ip, port))
+
+    def start(self):
+        self.server.listen()
+        if self.verbose:
+            print(f"[SERVER] Started. IP={self.ip}, PORT={self.port}")
+
+        while True:
+            conn, addr = self.server.accept()
