@@ -45,9 +45,10 @@ def pack_num(i):
 
 
 def unpack_num(data):
-    file = io.BytesIO(data)
-    cls = file.read(1)
-    num = struct.unpack("f", file.read(4))[0]
+    if isinstance(data, bytes):
+        data = io.BytesIO(data)
+    cls = data.read(1)
+    num = struct.unpack("f", data.read(4))[0]
     if cls == b"\x00":
         num = int(num)
     return num
@@ -93,26 +94,34 @@ def dumps(obj: Any):
     return data
 
 
-def loads(data: bytes):
+def loads(data):
     """
     Loads byte string as an object.
     :param data: String of bytes to load.
     """
-    file = io.BytesIO(data)
-    cls = file.read(1)
+    if isinstance(data, bytes):
+        data = io.BytesIO(data)
+    cls = data.read(1)
 
     if cls == b"\x00":
-        obj = True if file.read(1) == b"\x01" else False
-    elif cls == b"\x01" or cls == b"\x02":
-        obj = unpack_num(file.read(5))
+        obj = True if data.read(1) == b"\x01" else False
+    elif cls in (b"\x01", b"\x02"):
+        obj = unpack_num(data.read(5))
     elif cls == b"\x03":
-        length = unpack_num(file.read(5))
-        obj = file.read(length).decode()
+        length = unpack_num(data.read(5))
+        obj = data.read(length).decode()
     elif cls == b"\x04":
-        length = unpack_num(file.read(5))
-        obj = file.read(length)
+        length = unpack_num(data.read(5))
+        obj = data.read(length)
+    elif cls in (b"\x05", b"\x06"):
+        length = unpack_num(data.read(5))
+        obj = []
+        for _ in range(length):
+            obj.append(loads(data))
+        if cls == b"\x05":
+            obj = tuple(obj)
 
     return obj
 
-a = b"84.56"
+a = (1, 2, 3, [2, 3, 4], True, "bsdf")
 print(loads(dumps(a)))
