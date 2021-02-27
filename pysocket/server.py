@@ -61,8 +61,9 @@ class Client:
         self.start_func(self)
 
     def quit(self):
-        self.conn.close()
-        self.active = False
+        if self.active:
+            self.conn.close()
+            self.active = False
 
     def send(self, obj):
         data = self.cipher.encrypt(dumps(obj))
