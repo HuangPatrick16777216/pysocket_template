@@ -39,13 +39,12 @@ class Client:
 
     verbose: bool
     active: bool
-    args: Tuple[Any]
 
     header: int
     padding: str
     packet_size: int
 
-    def __init__(self, conn: socket.socket, addr: Tuple, start_func: Callable, verbose: bool, cipher: Fernet, args):
+    def __init__(self, conn: socket.socket, addr: Tuple, start_func: Callable, verbose: bool, cipher: Fernet):
         self.conn = conn
         self.addr = addr
         self.start_func = start_func
@@ -53,7 +52,6 @@ class Client:
 
         self.verbose = verbose
         self.active = True
-        self.args = args
 
         self.header = 64
         self.padding = " " * self.header
@@ -62,8 +60,8 @@ class Client:
     def alert(self, msg):
         print(f"[{self.addr}] {msg}")
 
-    def start(self):
-        self.start_func(self, *self.args)
+    def start(self, args):
+        self.start_func(self, args)
 
     def quit(self):
         if self.active:
