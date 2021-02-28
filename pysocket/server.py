@@ -20,7 +20,7 @@
 import threading
 import socket
 import ctypes
-from typing import Callable, List, Tuple
+from typing import Any, Callable, List, Tuple
 from cryptography.fernet import Fernet
 from .pack import loads, dumps
 
@@ -39,12 +39,13 @@ class Client:
 
     verbose: bool
     active: bool
+    args: Tuple[Any]
 
     header: int
     padding: str
     packet_size: int
 
-    def __init__(self, conn: socket.socket, addr: Tuple, start_func: Callable, verbose: bool, cipher: Fernet):
+    def __init__(self, conn: socket.socket, addr: Tuple, start_func: Callable, verbose: bool, cipher: Fernet, args):
         self.conn = conn
         self.addr = addr
         self.start_func = start_func
@@ -52,6 +53,7 @@ class Client:
 
         self.verbose = verbose
         self.active = True
+        self.args = args
 
         self.header = 64
         self.padding = " " * self.header
@@ -61,7 +63,7 @@ class Client:
         print(f"[{self.addr}] {msg}")
 
     def start(self):
-        self.start_func(self)
+        self.start_func(self, *self.args)
 
     def quit(self):
         if self.active:
@@ -109,12 +111,13 @@ class Server:
     cipher: Fernet
 
     verbose: bool
+    args: Tuple[Any]
     active: bool
     clients: List[Client]
 
     server: socket.socket
 
-    def __init__(self, ip: str, port: int, client_start: Callable, cipher_key: bytes, verbose: bool = True):
+    def __init__(self, ip: str, port: int, client_start: Callable, cipher_key: bytes, verbose: bool = True, args: Tuple = ()):
         """
         Initializes server.
         :param ip: IP address to bind to.
@@ -122,6 +125,7 @@ class Server:
         :param client_start: Start function of clients.
         :param cipher_key: Key used to encrypt messages. Auto-generated if set to None.
         :param verbose: Whether to print information to the console.
+        :param args: Arguments to pass to Client start.
         """
         self.ip = ip
         self.port = port
@@ -130,6 +134,7 @@ class Server:
         self.cipher = Fernet(self.cipher_key)
 
         self.verbose = verbose
+        self.args = args
         self.active = True
         self.clients = []
 
@@ -149,7 +154,7 @@ class Server:
                 return
             client = Client(conn, addr, self.client_start, self.verbose, self.cipher)
             self.clients.append(client)
-            threading.Thread(target=client.start).start()
+            threading.Thread(target=client.start, args=self.args).start()
 
     def quit(self, force: bool = False):
         """
