@@ -60,8 +60,8 @@ class Client:
     def alert(self, msg):
         print(f"[{self.addr}] {msg}")
 
-    def start(self, args):
-        self.start_func(self, args)
+    def start(self, *args):
+        self.start_func(self, *args)
 
     def quit(self):
         if self.active:
