@@ -20,7 +20,7 @@
 import socket
 from typing import Tuple, Callable
 from cryptography.fernet import Fernet
-from .pack import loads, dumps
+from bcon import loads, dumps
 
 
 class Client:

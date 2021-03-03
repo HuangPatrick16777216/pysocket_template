@@ -22,7 +22,7 @@ import socket
 import ctypes
 from typing import Any, Callable, List, Tuple
 from cryptography.fernet import Fernet
-from .pack import loads, dumps
+from bcon import loads, dumps
 
 
 class Client:
