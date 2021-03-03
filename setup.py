@@ -24,7 +24,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="py-socket",
-    version="0.0.2",
+    version="0.0.3",
     author="Patrick Huang",
     author_email="huangpatrick16777216@gmail.com",
     description="Template classes for Python socket applications.",
