@@ -17,6 +17,8 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
+__version__ = "0.0.2"
+
 from .server import Server
 from .client import Client
 from . import pack
