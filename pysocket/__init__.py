@@ -21,4 +21,3 @@ __version__ = "0.0.2"
 
 from .server import Server
 from .client import Client
-from . import pack
