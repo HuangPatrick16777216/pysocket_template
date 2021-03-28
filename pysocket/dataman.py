@@ -29,6 +29,7 @@ class DataMan:
         :param base_path: Base path of all data.
         """
         self.base_path = base_path
+        self.queue = []
 
     def read(self, path: str, mode: str = "r") -> Union[str, bytes]:
         with open(os.path.join(self.base_path, path), mode) as file:
@@ -53,4 +54,4 @@ class DataMan:
 
     def dump(self, obj: Any, path: str) -> None:
         with open(os.path.join(self.base_path, path), "w") as file:
-            json.dump(obj, file)
+            json.dump(obj, file, indent=4)
