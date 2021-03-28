@@ -20,4 +20,6 @@
 __version__ = "0.0.4"
 
 from .server import Server
+from .server import Client as ServerClient
 from .client import Client
+from .dataman import DataMan
