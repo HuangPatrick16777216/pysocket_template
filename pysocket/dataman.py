@@ -19,10 +19,15 @@
 
 import os
 import json
-from typing import Any, Union
+from typing import Any, List, Tuple, Union
 
 
 class DataMan:
+    """Data manager class."""
+
+    base_path: str
+    queue: List[Any]
+
     def __init__(self, base_path: str) -> None:
         """
         Initializes data manager.
@@ -30,6 +35,9 @@ class DataMan:
         """
         self.base_path = base_path
         self.queue = []
+
+    def join(self, *args: Tuple[str]) -> str:
+        return os.path.join(self.base_path, *args)
 
     def read(self, path: str, mode: str = "r") -> Union[str, bytes]:
         with open(os.path.join(self.base_path, path), mode) as file:
