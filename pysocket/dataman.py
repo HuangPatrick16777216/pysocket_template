@@ -47,6 +47,9 @@ class DataMan:
         with open(os.path.join(self.base_path, path), mode) as file:
             file.write(text)
 
+    def listdir(self, path: str) -> List[str]:
+        return os.listdir(os.path.join(self.base_path, path))
+
     def isfile(self, path: str) -> bool:
         return os.path.isfile(os.path.join(self.base_path, path))
 
