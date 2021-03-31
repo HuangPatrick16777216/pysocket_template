@@ -71,12 +71,18 @@ class Client:
     def recv(self):
         len_msg = b""
         while len(len_msg) < self.header:
-            len_msg += self.conn.recv(self.header-len(len_msg))
+            pkt = self.conn.recv(self.header-len(len_msg))
+            if len(pkt) == 0:
+                break
+            len_msg += pkt
 
         length = int(len_msg)
         data = b""
         while len(data) < length:
             curr_len = min(self.packet_size, length-len(data))
-            data += self.conn.recv(curr_len)
+            pkt = self.conn.recv(curr_len)
+            if len(pkt) == 0:
+                break
+            data += pkt
 
         return loads(self.cipher.decrypt(data))
