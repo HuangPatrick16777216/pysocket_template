@@ -104,8 +104,7 @@ class Client:
 
 class Server:
     """
-    Server class.
-    Handles client accepting.
+    Server class. Handles client accepting.
     """
 
     ip: str
